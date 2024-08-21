@@ -21,6 +21,14 @@ Deliverables:
 2. Offline Mode: A UI that supports offline functionality with service worker integration.
 3. Frontend Documentation: Detailed documentation on the design, framework used, and user interactions.
 
+
+
+
+
+
+
+
+
 Group 2: Backend Development and Database Integration**
 
 Title: "Building a Scalable Backend and Database for Real-Time Event Management"
@@ -41,6 +49,19 @@ Deliverables
 1. Backend API: A robust backend service with RESTful APIs.
 2. Database Integration: A well-structured and scalable database connected to the backend.
 3. Real-Time Communication: Implementation of real-time updates and notifications.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Group 3: Security, Deployment, and Scalability
