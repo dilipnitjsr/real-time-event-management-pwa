@@ -1,3 +1,22 @@
+Group 1: 
+Roll No : 2022UGCS107
+Roll No : 2022UGCS020
+Roll No: 2022UGCS008
+
+Group 2: 
+Roll No : 2022UGCS007
+Roll No : 2022UGCS087
+Roll No: 2022UGCS004
+
+Group 3: 
+Roll No : 2022UGCS024
+Roll No : 2022UGCS092
+Roll No: 2022UGCS100.
+
+
+-----------------------------------------------------------------------------------------------
+
+
 Group 1: Frontend Development and User Experience :Progressive Web Application (PWA)
 
 Title: "Design and Implementation of a Responsive Frontend for Real-Time Event Management PWA
