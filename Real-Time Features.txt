@@ -1,0 +1,27 @@
+Real-Time Features in the Project:
+
+Live Event Updates:
+  Description: Whenever there’s a change in event details (like time, venue, or status), the information is instantly updated on all users' screens.
+  Example: If the event organizer reschedules the event, all attendees are immediately notified through the PWA without needing to refresh the page.
+
+Real-Time Notifications:
+  Description: Users receive instant notifications about event-related activities, such as reminders, new event creation, or updates.
+  Example: If someone registers for an event or sends a message in an event chat, a notification is pushed to all relevant users in real-time.
+
+
+Live Chat:
+  Description: A chat feature allows users to communicate with each other in real-time during an event. Messages are instantly delivered and displayed.
+  Example: During an event, attendees can ask questions or discuss topics, and their messages appear instantly in the chat interface.
+
+Dynamic User Interactions:
+  Description: The PWA reacts immediately to user actions without waiting for a page reload.
+  Example: If a user likes or comments on an event, these actions are reflected instantly for all users viewing the event details.
+
+Event Status Change:
+    When the status of an event (e.g., from "Scheduled" to "Ongoing") changes, all users who are viewing the event page will see the update instantly without refreshing the page.
+
+Attendee Registration:
+    As soon as a new attendee registers for an event, the total number of attendees is updated in real-time across all user interfaces.
+
+Q&A Sessions During an Event:
+    During a live event, attendees can ask questions in real-time, and the presenter or other participants can respond immediately, with all users seeing the interaction as it happens.
