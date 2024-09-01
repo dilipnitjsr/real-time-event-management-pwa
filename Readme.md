@@ -1,3 +1,10 @@
+## env File
+DATABASE_URL="postgres://avnadmin:AVNS_-kZVcPifn0JKaiWuFoN@pg-38ddee7-aayushkumarhigh-a519.a.aivencloud.com:23558/defaultdb?sslmode=require"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0"
+GOOGLE_CLIENT_ID="496684763324-9jkgudvuc7a7ar7il1da95gqs6itca48.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="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"
+
 Group 1: Frontend Development and User Experience :Progressive Web Application (PWA)
 
 ## Design and Implementation of a Responsive Frontend for Real-Time Event Management PWA
