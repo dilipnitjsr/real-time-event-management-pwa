@@ -4,6 +4,7 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { Toaster } from "@/components/ui/sonner";
+import ReCaptchaProvider from "@/components/auth/ReCaptchaProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,12 +21,14 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <SessionProvider session={session}>
-    <html lang="en">
-      <body className={inter.className}>
-        <Toaster/>
-        {children}
-        </body>
-    </html>
+      <ReCaptchaProvider>
+        <html lang="en">
+          <body className={inter.className}>
+            <Toaster />
+            {children}
+          </body>
+        </html>
+      </ReCaptchaProvider>
     </SessionProvider>
   );
 }
