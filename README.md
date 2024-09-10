@@ -4,13 +4,6 @@
 
 
 
-# This was inserted by `prisma init`:
-# Environment variables declared in this file are automatically made available to Prisma.
-# See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
-
-# Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
-# See the documentation for all the connection string options: https://pris.ly/d/connection-strings
-
 DATABASE_URL="postgres://avnadmin:AVNS_a58dPnebKOnkZYwTiz7@pg-12a8698a-lavkushraj1155-3488.h.aivencloud.com:14482/Authdatabase?sslmode=require"
 AUTH_SECRET = "khg5tfk6eyetche4t4344jyd65ctu65tyv76ivo76v"
 
@@ -25,14 +18,8 @@ RESEND_API_KEY = re_FqAQutYc_GcLRuUeFaWyv9FAaqotNfN7Y
 
 NEXT_PUBLIC_APP_URL = "http://localhost:3000"
 
-
-
-
-
-
-
-
-
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY = 6LfXuTsqAAAAAP4-iSMpg3c1G3q-PIRdbZJ8fwn5
+RECAPTCHA_SECRET_KEY =6LfXuTsqAAAAAPvy7LFKxusJiFn6JOABUvreZZjI
 
 
 Group 1: Frontend Development and User Experience :Progressive Web Application (PWA)
