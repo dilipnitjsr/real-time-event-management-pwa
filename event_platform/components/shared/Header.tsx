@@ -15,7 +15,9 @@ const Header = () => {
             alt="Evently logo" 
           />
         </Link>
-
+        {/* <Link href='/chat'>
+      Go to Chat
+      </Link> */}
         <SignedIn>
           <nav className="md:flex-between hidden w-full max-w-xs">
             <NavItems />

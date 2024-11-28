@@ -3,7 +3,9 @@ import Collection from '@/components/shared/Collection';
 import { getEventById, getRelatedEventsByCategory } from '@/lib/actions/event.actions'
 import { formatDateTime } from '@/lib/utils';
 import { SearchParamProps } from '@/types'
+import Link from "next/link"
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) => {
   const event = await getEventById(id);
@@ -71,12 +73,19 @@ const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) 
           </div>
 
           <div className="flex flex-col gap-2">
+            <Button>
+            <Link href='/chat'>
+      Go to Chat
+      </Link>
+            </Button>
+     
             <p className="p-bold-20 text-grey-600">What You'll Learn:</p>
             <p className="p-medium-16 lg:p-regular-18">{event.description}</p>
             <p className="p-medium-16 lg:p-regular-18 truncate text-primary-500 underline">{event.url}</p>
           </div>
         </div>
       </div>
+  
     </section>
 
     {/* EVENTS with the same category */}
