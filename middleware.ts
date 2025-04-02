@@ -6,7 +6,10 @@ export default authMiddleware({
     '/events/:id',
     '/api/webhook/clerk',
     '/api/webhook/stripe',
-    '/api/uploadthing'
+    '/api/uploadthing',
+    '/api/',
+    "/chat",
+    "/chatpublic",
   ],
   ignoredRoutes: [
     '/api/webhook/clerk',
