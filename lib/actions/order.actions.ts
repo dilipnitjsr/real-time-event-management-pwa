@@ -121,8 +121,12 @@ export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUs
   try {
     await connectToDatabase()
 
+    if (!userId) throw new Error('User ID is required')
+    
+    // Handle both string and object userId inputs
+    const userIdString = typeof userId === 'string' ? userId : (userId as { userId: string }).userId
     const skipAmount = (Number(page) - 1) * limit
-    const conditions = { buyer: userId }
+    const conditions = { buyer: userIdString }
 
     const orders = await Order.distinct('event._id')
       .find(conditions)

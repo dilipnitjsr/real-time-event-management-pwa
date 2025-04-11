@@ -101,6 +101,7 @@ export async function getAllEvents({ query, limit = 6, page, category }: GetAllE
 
     const titleCondition = query ? { title: { $regex: query, $options: 'i' } } : {}
     const categoryCondition = category ? await getCategoryByName(category) : null
+
     const conditions = {
       $and: [titleCondition, categoryCondition ? { category: categoryCondition._id } : {}],
     }
@@ -128,7 +129,11 @@ export async function getEventsByUser({ userId, limit = 6, page }: GetEventsByUs
   try {
     await connectToDatabase()
 
-    const conditions = { organizer: userId }
+    if (!userId) throw new Error('User ID is required')
+    
+    // Handle both string and object userId inputs
+    const userIdString = typeof userId === 'string' ? userId : (userId as { userId: string }).userId
+    const conditions = { organizer: userIdString }
     const skipAmount = (page - 1) * limit
 
     const eventsQuery = Event.find(conditions)
