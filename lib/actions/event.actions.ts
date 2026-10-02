@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 
+import { requireAuthenticatedUser } from '@/lib/auth'
 import { connectToDatabase } from '@/lib/database'
 import Event from '@/lib/database/models/event.model'
 import User from '@/lib/database/models/user.model'
@@ -28,16 +29,18 @@ const populateEvent = (query: any) => {
 }
 
 // CREATE
-export async function createEvent({ userId, event, path }: CreateEventParams) {
+export async function createEvent({ event, path }: CreateEventParams) {
   try {
-    await connectToDatabase()
+    const currentUser = await requireAuthenticatedUser()
+    const organizerId = currentUser._id.toString()
 
-    const organizer = await User.findById(userId)
-    if (!organizer) throw new Error('Organizer not found')
+    const newEvent = await Event.create({
+      ...event,
+      category: event.categoryId,
+      organizer: organizerId,
+    })
 
-    const newEvent = await Event.create({ ...event, category: event.categoryId, organizer: userId })
     revalidatePath(path)
-
     return JSON.parse(JSON.stringify(newEvent))
   } catch (error) {
     handleError(error)
@@ -60,22 +63,23 @@ export async function getEventById(eventId: string) {
 }
 
 // UPDATE
-export async function updateEvent({ userId, event, path }: UpdateEventParams) {
+export async function updateEvent({ event, path }: UpdateEventParams) {
   try {
-    await connectToDatabase()
+    const currentUser = await requireAuthenticatedUser()
+    const currentUserId = currentUser._id.toString()
 
     const eventToUpdate = await Event.findById(event._id)
-    if (!eventToUpdate || eventToUpdate.organizer.toHexString() !== userId) {
+    if (!eventToUpdate || eventToUpdate.organizer.toString() !== currentUserId) {
       throw new Error('Unauthorized or event not found')
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
       event._id,
-      { ...event, category: event.categoryId },
+      { ...event, category: event.categoryId, organizer: currentUserId },
       { new: true }
     )
-    revalidatePath(path)
 
+    revalidatePath(path)
     return JSON.parse(JSON.stringify(updatedEvent))
   } catch (error) {
     handleError(error)
@@ -85,10 +89,16 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
 // DELETE
 export async function deleteEvent({ eventId, path }: DeleteEventParams) {
   try {
-    await connectToDatabase()
+    const currentUser = await requireAuthenticatedUser()
+    const currentUserId = currentUser._id.toString()
 
-    const deletedEvent = await Event.findByIdAndDelete(eventId)
-    if (deletedEvent) revalidatePath(path)
+    const event = await Event.findById(eventId)
+    if (!event || event.organizer.toString() !== currentUserId) {
+      throw new Error('Unauthorized or event not found')
+    }
+
+    await Event.findByIdAndDelete(eventId)
+    revalidatePath(path)
   } catch (error) {
     handleError(error)
   }
@@ -125,15 +135,10 @@ export async function getAllEvents({ query, limit = 6, page, category }: GetAllE
 }
 
 // GET EVENTS BY ORGANIZER
-export async function getEventsByUser({ userId, limit = 6, page }: GetEventsByUserParams) {
+export async function getEventsByUser({ limit = 6, page }: GetEventsByUserParams) {
   try {
-    await connectToDatabase()
-
-    if (!userId) throw new Error('User ID is required')
-    
-    // Handle both string and object userId inputs
-    const userIdString = typeof userId === 'string' ? userId : (userId as { userId: string }).userId
-    const conditions = { organizer: userIdString }
+    const currentUser = await requireAuthenticatedUser()
+    const conditions = { organizer: currentUser._id.toString() }
     const skipAmount = (page - 1) * limit
 
     const eventsQuery = Event.find(conditions)
