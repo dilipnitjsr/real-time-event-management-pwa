@@ -1,19 +1,29 @@
 "use server"
 
-import Stripe from 'stripe';
-import { CheckoutOrderParams, CreateOrderParams, GetOrdersByEventParams, GetOrdersByUserParams } from "@/types"
-import { redirect } from 'next/navigation';
-import { handleError } from '../utils';
-import { connectToDatabase } from '../database';
-import Order from '../database/models/order.model';
-import Event from '../database/models/event.model';
-import {ObjectId} from 'mongodb';
-import User from '../database/models/user.model';
+import Stripe from 'stripe'
+import { CheckoutOrderParams, GetOrdersByEventParams, GetOrdersByUserParams } from "@/types"
+import { redirect } from 'next/navigation'
+import { handleError } from '../utils'
+import { connectToDatabase } from '../database'
+import Order from '../database/models/order.model'
+import Event from '../database/models/event.model'
+import { ObjectId } from 'mongodb'
+import User from '../database/models/user.model'
+import { requireAuthenticatedUser } from '../auth'
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const stripeSecret = process.env.STRIPE_SECRET_KEY
+  if (!stripeSecret) throw new Error('STRIPE_SECRET_KEY is missing')
 
-  const price = order.isFree ? 0 : Number(order.price) * 100;
+  const stripe = new Stripe(stripeSecret)
+  const currentUser = await requireAuthenticatedUser()
+
+  const event = await Event.findById(order.eventId)
+  if (!event) throw new Error('Event not found')
+
+  const price = event.isFree ? 0 : Number(event.price) * 100
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL
+  if (!serverUrl) throw new Error('NEXT_PUBLIC_SERVER_URL is missing')
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -23,50 +33,39 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
             currency: 'usd',
             unit_amount: price,
             product_data: {
-              name: order.eventTitle
-            }
+              name: event.title,
+            },
           },
-          quantity: 1
+          quantity: 1,
         },
       ],
       metadata: {
-        eventId: order.eventId,
-        buyerId: order.buyerId,
+        eventId: event._id.toString(),
+        buyerId: currentUser._id.toString(),
       },
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
-    });
+      success_url: `${serverUrl}/profile`,
+      cancel_url: `${serverUrl}/`,
+    })
 
     redirect(session.url!)
   } catch (error) {
-    throw error;
-  }
-}
-
-export const createOrder = async (order: CreateOrderParams) => {
-  try {
-    await connectToDatabase();
-    
-    const newOrder = await Order.create({
-      ...order,
-      event: order.eventId,
-      buyer: order.buyerId,
-    });
-
-    return JSON.parse(JSON.stringify(newOrder));
-  } catch (error) {
-    handleError(error);
+    throw error
   }
 }
 
 // GET ORDERS BY EVENT
 export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEventParams) {
   try {
-    await connectToDatabase()
+    const currentUser = await requireAuthenticatedUser()
 
     if (!eventId) throw new Error('Event ID is required')
     const eventObjectId = new ObjectId(eventId)
+
+    const event = await Event.findById(eventObjectId)
+    if (!event || event.organizer.toString() !== currentUser._id.toString()) {
+      throw new Error('Unauthorized or event not found')
+    }
 
     const orders = await Order.aggregate([
       {
@@ -77,9 +76,7 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
           as: 'buyer',
         },
       },
-      {
-        $unwind: '$buyer',
-      },
+      { $unwind: '$buyer' },
       {
         $lookup: {
           from: 'events',
@@ -88,9 +85,7 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
           as: 'event',
         },
       },
-      {
-        $unwind: '$event',
-      },
+      { $unwind: '$event' },
       {
         $project: {
           _id: 1,
@@ -117,16 +112,12 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
 }
 
 // GET ORDERS BY USER
-export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUserParams) {
+export async function getOrdersByUser({ limit = 3, page }: GetOrdersByUserParams) {
   try {
-    await connectToDatabase()
+    const currentUser = await requireAuthenticatedUser()
 
-    if (!userId) throw new Error('User ID is required')
-    
-    // Handle both string and object userId inputs
-    const userIdString = typeof userId === 'string' ? userId : (userId as { userId: string }).userId
     const skipAmount = (Number(page) - 1) * limit
-    const conditions = { buyer: userIdString }
+    const conditions = { buyer: currentUser._id.toString() }
 
     const orders = await Order.distinct('event._id')
       .find(conditions)
